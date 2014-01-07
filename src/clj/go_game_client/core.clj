@@ -40,5 +40,6 @@
 
 
 
-(def app (-> #'app-routes
-             (handler/api)))
+(def app
+  (-> #'app-routes
+      (handler/api)))

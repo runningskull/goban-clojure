@@ -3,4 +3,4 @@
   (:import [goog.ui IdGenerator]))
 
 (defn guid []
-  (.genNextUniqueId (.getInstance IdGenerator)))
+  (.getNextUniqueId (.getInstance IdGenerator)))
