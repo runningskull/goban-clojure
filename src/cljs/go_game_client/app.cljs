@@ -18,8 +18,20 @@
 
 ;;;; Utils
 
+(defn- debugger! []
+  (js/eval "debugger"))
+
 (defn- with-id [m]
   (assoc m :id (guid)))
+
+(defn- value-from-node [component field-ref]
+  (let [n (om/get-node component field-ref)
+        v (-> n .-value clojure.string/trim)]
+    (when-not (empty? v)
+      [v n])))
+
+(defn- clear-nodes! [& nodes]
+  (doall (map #(set! (.-value %) "") nodes)))
 
 
 
@@ -31,12 +43,25 @@
           (>! c (vec (map with-id comments)))))
     c))
 
+(defn save-comment! [comment url]
+  (go (let [res (<! (http/post url {:json-params comment}))]
+        (prn (get-in res [:body :message])))))
+
 
 
 ;;;; Application
 
 (def app-state
   (atom {}))
+
+(defn handle-submit [e owner opts]
+  (.preventDefault e)
+  (let [[author author-node] (value-from-node owner "author")
+        [text text-node] (value-from-node owner "text")]
+    (when (and author text)
+      (prn {:url opts})
+      (save-comment! {:author author :text text} (:url opts))
+      (clear-nodes! author-node text-node))))
 
 (defn comment [{:keys [author text] :as c} owner opts]
   (om/component
@@ -52,19 +77,24 @@
 
 (defn comment-form [app owner opts]
   (om/component
-   (html [:div.commentForm "alo world. i am a comment form!"])))
+   (html [:form.commentForm {:onSubmit #(handle-submit % owner opts)}
+          [:input {:type "text" :placeholder "Your Name" :ref "author"}]
+          [:input {:type "text" :placeholder "Say something..." :ref "text"}]
+          [:input {:type "submit" :value "SAY IT"}]])))
 
 (defn comment-box [app owner opts]
   (reify
     om/IInitState
     (init-state [_]
       (om/transact! app [:comments] (fn [] [])))
+
     om/IWillMount
     (will-mount [_]
       (go (while true
             (let [comments (<! (fetch-comments (:url opts)))]
               (om/update! app #(assoc % :comments comments)))
             (<! (timeout (:poll-interval opts))))))
+
     om/IRender
     (render [_]
       (html [:div.commentBox
