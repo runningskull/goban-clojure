@@ -37,7 +37,7 @@
                         :source-paths ["src/cljs"]
                         :compiler {:output-to "resources/public/js/go.js"
                                    :output-dir "resources/public/js/out"
-                                   :preamble ["om/react.min.js"]
+                                   :preamble ["om/react.js"]
                                    :externs ["om/externs/react.js"]
                                    :optimizations :none
                                    :pretty-print true

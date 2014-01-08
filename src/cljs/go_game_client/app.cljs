@@ -54,13 +54,16 @@
 (def app-state
   (atom {}))
 
-(defn handle-submit [e owner opts]
+(defn handle-submit [e owner app opts]
   (.preventDefault e)
   (let [[author author-node] (value-from-node owner "author")
         [text text-node] (value-from-node owner "text")]
     (when (and author text)
-      (prn {:url opts})
-      (save-comment! {:author author :text text} (:url opts))
+      (let [comment {:author author :text text}]
+        (save-comment! {:author author :text text} (:url opts))
+        (prn "COMMENT" comment)
+        (om/transact! app [:comments]
+                      (fn [comments] (conj comments (assoc comment :id (guid))))))
       (clear-nodes! author-node text-node))))
 
 (defn comment [{:keys [author text] :as c} owner opts]
@@ -77,7 +80,7 @@
 
 (defn comment-form [app owner opts]
   (om/component
-   (html [:form.commentForm {:onSubmit #(handle-submit % owner opts)}
+   (html [:form.commentForm {:onSubmit #(handle-submit % owner app opts)}
           [:input {:type "text" :placeholder "Your Name" :ref "author"}]
           [:input {:type "text" :placeholder "Say something..." :ref "text"}]
           [:input {:type "submit" :value "SAY IT"}]])))
