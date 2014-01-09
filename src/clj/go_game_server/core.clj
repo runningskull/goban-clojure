@@ -4,6 +4,8 @@
             [compojure.core :refer [GET POST defroutes]]
             [ring.util.response :as resp]
             [cheshire.core :as json]
+            [clojure.core.async :refer [<! >! close! go]]
+            [chord.http-kit :refer [with-channel]]
             [clojure.java.io :as io]))
 
 
@@ -15,26 +17,19 @@
    :body (json/generate-string data)})
 
 
-(defn init []
-  (reset! comments (-> (slurp "comments.json")
-                       (json/parse-string true)
-                       vec)))
-
-(defn save-comment! [{:keys [body]}]
-  (let [comment (-> body io/reader slurp (json/parse-string true))]
-    (swap! comments conj comment)
-    (json-response {:message "Saved comment."})))
+(defn ws-handler [req]
+  (with-channel req ws
+    (println "Opened websocket connection from " (req :remote-addr))
+    (go-loop []
+             (when-let [{:keys [message]} (<! ws)]
+               (println "Message received: " message)
+               (>! ws (format "You said: '%s' at %s" message (java.util.Date.)))
+               (recur)))))
 
 
 (defroutes app-routes
   (GET "/" [] (resp/redirect "/index.html"))
-
-  (GET "/comments" [] (json-response
-                       {:message "Here's the comments:"
-                        :comments @comments}))
-
-  (POST "/comments" req (save-comment! req))
-
+  (GET "/ws" [] ws-handler)
   (route/resources "/")
   (route/not-found "Page not found"))
 

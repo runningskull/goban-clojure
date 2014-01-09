@@ -16,20 +16,22 @@
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [com.cemerick/piggieback "0.1.2"]
                  [hickory "0.5.1"]
-                 [markdown-clj "0.9.38"]
                  [cljs-http "0.1.2"]
                  [om "0.1.4"]
-                 [sablono "0.1.5"]]
+                 [sablono "0.1.5"]
 
-  :main go-game-client.core
-  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+                 ;; Both
+                 [jarohen/chord "0.2.2"]]
+
+  :main go-game-server.core
+  ;; :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
   :plugins [[lein-cljsbuild "1.0.0-alpha2"]
             [lein-ring "0.8.7"]
             [lein-pdo "0.1.1"]]
 
-  :ring {:handler go-game-client.core/app
-         :init go-game-client.core/init}
+  :ring {:handler go-game-server.core/app
+         :init go-game-server.core/init}
 
   :source-paths ["src/clj" "src/cljs"]
 
