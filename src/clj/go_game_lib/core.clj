@@ -1,9 +1,6 @@
 (ns go-game-lib.core
-  (:require [clojure.set :refer [union difference intersection]]
-            [go-game-cli.core :as cli]))
+  (:require [clojure.set :refer [union difference intersection]]))
 
-(def nil-stone {:color nil
-                :chain nil})
 
 (def default-board-size 19)
 
@@ -14,8 +11,9 @@
 (defn next-color [color]
   (if (= :black color) :white :black))
 
-(defn xy->yx [points]
+(defn- xy->yx [points]
   (mapv vec (map rseq points)))
+
 
 
 
@@ -25,11 +23,15 @@
   (let [size (or board-size default-board-size)]
     (vec (repeat size (vec (repeat size nil))))))
 
-(defn in-bounds?
-  ([[x y :as xy]]
-     (in-bounds? xy default-board-size))
-  ([[x y] board-size]
-     (not (or (< x 0) (< y 0) (> x board-size) (> y board-size)))))
+(defn new-stone [color & [chain]]
+  {:color color :chain chain})
+
+
+;; info about a given point
+
+(defn in-bounds? [[x y] board-size]
+  (let [size (- (or board-size default-board-size) 1)]
+    (not (or (< x 0) (< y 0) (> x size) (> y size)))))
 
 (defn get-stone [board [x y :as xy]]
   (when (in-bounds? xy (count board))
@@ -38,13 +40,17 @@
 (defn occupied? [board [x y :as xy]]
   (not (nil? (get-stone board xy))))
 
+
+;; info about points around a given point
+
 (defn neighboring-coords [[x y] & [board-size]]
   (filter #(in-bounds? % board-size)
           [[(- x 1) y] [(+ x 1) y] [x (- y 1)] [x (+ y 1)]]))
 
 (defn neighboring-stones [board [x y :as xy] & [color]]
-  (let [stones (filter #(not (nil? %)) (map #(get-stone board %)
-                                            (neighboring-coords xy (count board))))]
+  (let [stones (filter #(not (nil? %))
+                       (map #(get-stone board %)
+                            (neighboring-coords xy (count board))))]
     (if color
       (filter #(= color (:color %)) stones) ;; TODO: more elegant expression?
       stones)))
@@ -55,8 +61,10 @@
 (defn liberties [board [x y :as xy]]
   (filter #(not (occupied? board %)) (neighboring-coords xy (count board))))
 
-(defn new-stone [color & [chain]]
-  {:color color :chain chain})
+
+
+
+;;;; Bulk Updates
 
 (defn update-stones [board points-yx update]
   (loop [new-board board
@@ -69,6 +77,11 @@
 (defn remove-stones [board points]
   (update-stones board (xy->yx points) nil))
 
+(defn update-chained-stones [board new-chain]
+  (let [affected-points (mapv #(conj % :chain) (xy->yx (:points new-chain)))]
+    (update-stones board affected-points new-chain)))
+
+
 
 
 ;;;; Chains
@@ -77,14 +90,23 @@
   {:points #{xy}})
 
 (defn chain-liberties [board chain]
-  (set (apply concat (map #(liberties board %) (:points chain)))))
+  (set (apply concat (map #(liberties board %)
+                          (:points chain)))))
 
 (defn merge-chains [chains]
   {:points (apply union (map :points chains))})
 
-(defn update-chained-stones [board new-chain]
-  (let [affected-points (mapv #(conj % :chain) (xy->yx (:points new-chain)))]
-    (update-stones board affected-points new-chain)))
+(defn dead? [board chain]
+  (not (seq (chain-liberties board chain))))
+
+(defn captured-points [board [x y :as placed-point]]
+  (let [captured-color (next-color (:color (get-stone board placed-point)))]
+    (:points (merge-chains
+              (filter #(dead? board %)
+                      (neighboring-chains board placed-point captured-color))))))
+
+
+;; Update chains after a move is made
 
 (defn merge-neighboring-chains [board [x y :as xy]]
   (let [stone (get-stone board xy)
@@ -93,25 +115,23 @@
     (update-chained-stones board new-chain)))
 
 (defn remove-captured-chains [board [x y :as placed-point]]
-  (let [stone (get-stone board placed-point)
-        captured-color (next-color (:color stone))
-        neighbors (neighboring-chains board placed-point captured-color)
-        surrounded-neighbors (filter #(= 0 (count (chain-liberties board %)))
-                                     neighbors)
-        removed-points (:points (merge-chains surrounded-neighbors))]
-    (remove-stones board removed-points)))
+  (remove-stones board (captured-points board placed-point)))
 
 
 
 ;;;; Gameplay Logic
 
-(defn suicidal? [board [x y :as xy]]
-  (> 0 (count (chain-liberties board (:chain (get-stone board xy))))))
+(defn move-captures? [new-board [x y :as xy]]
+  (> (count (captured-points new-board xy)) 0))
+
+(defn move-suicides? [new-board [x y :as xy]]
+  (dead? new-board (:chain (get-stone new-board xy))))
 
 (defn valid-move? [old-board new-board [x y :as xy]]
   (when (and (in-bounds? xy (count new-board))
              (not (occupied? old-board xy))
-             (not (suicidal? new-board xy)))
+             (or (move-captures? new-board xy)
+                 (not (move-suicides? new-board xy))))
     true))
 
 (defn put-stone-at-point [board color [x y :as xy]]
@@ -122,32 +142,13 @@
     (when (valid-move? board candidate-board xy)
       (remove-captured-chains candidate-board xy))))
 
+;; TODO
+(defn winner [board]
+  nil)
 
-
-;;;; Testing CLI
-
-(defn- cli-parse-user-coords [input]
-  (vec (map #(Integer/parseInt %) (clojure.string/split input #"-"))))
-
-(defn cli-place-stones [board color]
-  (println (cli/print-board board))
-  (let [input (read-line)]
-    (cond
-     (= "stop" input) (println "G'bye!")
-     (= "board" input) (do (println board) (recur board color))
-
-     :else (let [coords (cli-parse-user-coords input)
-                 new-board (put-stone-at-point board color coords)]
-             (if new-board
-               (recur new-board (next-color color))
-               (recur board color))))))
-
-(cli-place-stones (empty-board) :black)
 
 
 ;; TODO:
-;;  - lets you commit suicide
 ;;  - doesn't even try to enforce ko or super-ko
-;;  - doesn't let you place at 18-18
 ;;  - doesn't allow pass/resign
 
