@@ -14,6 +14,9 @@
 (defn- xy->yx [points]
   (mapv vec (map rseq points)))
 
+(defn hash-board [board]
+  (hash (map #(map :color %) board)))
+
 
 
 
@@ -127,20 +130,25 @@
 (defn move-suicides? [new-board [x y :as xy]]
   (dead? new-board (:chain (get-stone new-board xy))))
 
-(defn valid-move? [old-board new-board [x y :as xy]]
+(defn repeats-position? [new-board ko-history]
+  (when ko-history
+    (contains? ko-history (hash-board new-board))))
+
+(defn valid-move? [old-board new-board [x y :as xy] & [ko-history]]
   (when (and (in-bounds? xy (count new-board))
              (not (occupied? old-board xy))
-             (or (move-captures? new-board xy)
-                 (not (move-suicides? new-board xy))))
+             (not (repeats-position? new-board ko-history))
+             (or (not (move-suicides? new-board xy))
+                 (move-captures? new-board xy)))
     true))
 
-(defn put-stone-at-point [board color [x y :as xy]]
-  (let [chain (blank-chain xy)
-        stone (new-stone color chain)
-        candidate-board (merge-neighboring-chains
-                         (assoc-in board [y x] stone) xy)]
-    (when (valid-move? board candidate-board xy)
-      (remove-captured-chains candidate-board xy))))
+(defn place-stone [board color [x y :as xy] & [ko-history]]
+  (let [stone (new-stone color (blank-chain xy))
+        candidate-board (remove-captured-chains
+                         (merge-neighboring-chains
+                          (assoc-in board [y x] stone) xy) xy)]
+    (when (valid-move? board candidate-board xy ko-history)
+      candidate-board)))
 
 ;; TODO
 (defn winner [board]
