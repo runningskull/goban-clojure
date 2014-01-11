@@ -11,11 +11,11 @@
 
 ;;;; Helpers
 
-(defn- not-nil? [x]
-  (not (nil? x)))
-
 (defn next-color [color]
   (if (= :black color) :white :black))
+
+(defn xy->yx [points]
+  (mapv vec (map rseq points)))
 
 
 
@@ -39,14 +39,14 @@
   (not (nil? (get-stone board xy))))
 
 (defn neighboring-coords [[x y] & [board-size]]
-  (filter #(in-bounds? % (or board-size default-board-size))
+  (filter #(in-bounds? % board-size)
           [[(- x 1) y] [(+ x 1) y] [x (- y 1)] [x (+ y 1)]]))
 
 (defn neighboring-stones [board [x y :as xy] & [color]]
   (let [stones (filter #(not (nil? %)) (map #(get-stone board %)
                                             (neighboring-coords xy (count board))))]
     (if color
-      (filter #(= color (% :color)) stones) ;; TODO: more elegant expression?
+      (filter #(= color (:color %)) stones) ;; TODO: more elegant expression?
       stones)))
 
 (defn neighboring-chains [board [x y :as xy] & [color]]
@@ -67,7 +67,7 @@
              (rest remaining-points)))))
 
 (defn remove-stones [board points]
-  (update-stones board (mapv vec (map rseq points)) nil))
+  (update-stones board (xy->yx points) nil))
 
 
 
@@ -83,8 +83,7 @@
   {:points (apply union (map :points chains))})
 
 (defn update-chained-stones [board new-chain]
-  (let [affected-points (mapv #(conj % :chain)
-                              (mapv vec (mapv rseq (:points new-chain))))]
+  (let [affected-points (mapv #(conj % :chain) (xy->yx (:points new-chain)))]
     (update-stones board affected-points new-chain)))
 
 (defn merge-neighboring-chains [board [x y :as xy]]
@@ -106,13 +105,13 @@
 
 ;;;; Gameplay Logic
 
-(defn results-in-suicide? [board [x y :as xy]]
+(defn suicidal? [board [x y :as xy]]
   (> 0 (count (chain-liberties board (:chain (get-stone board xy))))))
 
 (defn valid-move? [old-board new-board [x y :as xy]]
   (when (and (in-bounds? xy (count new-board))
              (not (occupied? old-board xy))
-             (not (results-in-suicide? new-board xy)))
+             (not (suicidal? new-board xy)))
     true))
 
 (defn put-stone-at-point [board color [x y :as xy]]
@@ -146,4 +145,9 @@
 (cli-place-stones (empty-board) :black)
 
 
-;; TODO: lets you commit suicide
+;; TODO:
+;;  - lets you commit suicide
+;;  - doesn't even try to enforce ko or super-ko
+;;  - doesn't let you place at 18-18
+;;  - doesn't allow pass/resign
+
