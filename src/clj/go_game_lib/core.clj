@@ -14,6 +14,9 @@
 (defn- not-nil? [x]
   (not (nil? x)))
 
+(defn next-color [color]
+  (if (= :black color) :white :black))
+
 
 
 ;;;; Board Logic
@@ -23,99 +26,122 @@
     (vec (repeat size (vec (repeat size nil))))))
 
 (defn in-bounds?
-  ([[x y :as xy]] (in-bounds? xy default-board-size))
+  ([[x y :as xy]]
+     (in-bounds? xy default-board-size))
   ([[x y] board-size]
      (not (or (< x 0) (< y 0) (> x board-size) (> y board-size)))))
 
-(defn get-stone-at-point [board [x y :as xy]]
-  (when (in-bounds? (count board) xy)
+(defn get-stone [board [x y :as xy]]
+  (when (in-bounds? xy (count board))
     ((board y) x)))
 
 (defn occupied? [board [x y :as xy]]
-  (not (nil? (get-stone-at-point board xy))))
+  (not (nil? (get-stone board xy))))
 
 (defn neighboring-coords [[x y] & [board-size]]
-  (filter #(in-bounds? board-size %) [[(- x 1) y] [(+ x 1) y] [x (- y 1)] [x (+ y 1)]]))
+  (filter #(in-bounds? % (or board-size default-board-size))
+          [[(- x 1) y] [(+ x 1) y] [x (- y 1)] [x (+ y 1)]]))
 
 (defn neighboring-stones [board [x y :as xy] & [color]]
-  (let [stones (filter #(not (nil? %)) (map get-stone-at-point
+  (let [stones (filter #(not (nil? %)) (map #(get-stone board %)
                                             (neighboring-coords xy (count board))))]
     (if color
       (filter #(= color (% :color)) stones) ;; TODO: more elegant expression?
       stones)))
 
-(defn neighboring-chains [board color [x y :as xy] & [color]]
+(defn neighboring-chains [board [x y :as xy] & [color]]
   (map :chain (neighboring-stones board xy color)))
 
 (defn liberties [board [x y :as xy]]
-  (filter #(not (occupied? %)) (neighboring-stones xy (count board))))
+  (filter #(not (occupied? board %)) (neighboring-coords xy (count board))))
 
 (defn new-stone [color & [chain]]
   {:color color :chain chain})
+
+(defn update-stones [board points-yx update]
+  (loop [new-board board
+         remaining-points points-yx]
+    (if-not (seq remaining-points)
+      new-board
+      (recur (assoc-in new-board (first remaining-points) update)
+             (rest remaining-points)))))
+
+(defn remove-stones [board points]
+  (update-stones board (mapv vec (map rseq points)) nil))
 
 
 
 ;;;; Chains
 
-(defn blank-chain [board [x y :as xy]]
-  {:liberties (set (liberties board xy))
-   :points #{xy}})
+(defn blank-chain [[x y :as xy]]
+  {:points #{xy}})
+
+(defn chain-liberties [board chain]
+  (set (apply concat (map #(liberties board %) (:points chain)))))
 
 (defn merge-chains [chains]
-  (let [points (union map :points chains)
-        liberties (union map :liberties chains)]
-    {:points points
-     :liberties (difference liberties (intersection points liberties))}))
+  {:points (apply union (map :points chains))})
 
-(defn update-stones-in-chain [board new-chain]
-  ;; TODO: - is there a better way to do this than (loop ...) ?
-  ;;       - can write a (assoc-in!) function so we can use transients?
-  ;;       - optimization: could (rseq) inside loop instead of mapping first
-  (loop [new-board board
-         affected-points (map rseq (new-chain :points))] ;; [x y] -> [row column]
-    (if-not (seq affected-points)
-      new-board
-      (recur (assoc-in new-board (conj (first affected-points) :chain) new-chain)
-             (rest affected-points)))))
+(defn update-chained-stones [board new-chain]
+  (let [affected-points (mapv #(conj % :chain)
+                              (mapv vec (mapv rseq (:points new-chain))))]
+    (update-stones board affected-points new-chain)))
 
 (defn merge-neighboring-chains [board [x y :as xy]]
-  (let [stone (get-stone-at-point board xy)
-        new-chain (merge-chains (conj (neighboring-chains board xy (stone :color))
-                                      (stone :chain)))]
-    (update-stones-in-chain board new-chain)))
+  (let [stone (get-stone board xy)
+        new-chain (merge-chains (conj (neighboring-chains board xy (:color stone))
+                                      (:chain stone)))]
+    (update-chained-stones board new-chain)))
 
-(defn reduce-neighboring-opponent-liberties [board [x y :as new-point]]
-  (let [stone (get-stone-at-point board xy)
-        chains (neighboring-chains board xy (next-color (stone :color)))])
-  ;; TODO: remove xy from all neighboring chains' liberties
-  board)
+(defn remove-captured-chains [board [x y :as placed-point]]
+  (let [stone (get-stone board placed-point)
+        captured-color (next-color (:color stone))
+        neighbors (neighboring-chains board placed-point captured-color)
+        surrounded-neighbors (filter #(= 0 (count (chain-liberties board %)))
+                                     neighbors)
+        removed-points (:points (merge-chains surrounded-neighbors))]
+    (remove-stones board removed-points)))
 
 
 
 ;;;; Gameplay Logic
 
-(defn next-color [color]
-  (if (= :black color) :white :black))
+(defn results-in-suicide? [board [x y :as xy]]
+  (> 0 (count (chain-liberties board (:chain (get-stone board xy))))))
 
-;; TODO
-(defn valid-move? [board color [x y :as xy]]
-  (when (in-bounds? xy (count board))
+(defn valid-move? [old-board new-board [x y :as xy]]
+  (when (and (in-bounds? xy (count new-board))
+             (not (occupied? old-board xy))
+             (not (results-in-suicide? new-board xy)))
     true))
 
-
 (defn put-stone-at-point [board color [x y :as xy]]
-  (let [chain (blank-chain board xy)
+  (let [chain (blank-chain xy)
         stone (new-stone color chain)
         candidate-board (merge-neighboring-chains
-                         (assoc-in board [y x] stone) stone xy)]
-    (when (valid-move? candidate-board color xy)
-      ;; TODO
-      ;;  - reduce-neighboring-opponent-liberties
-      nil)))
+                         (assoc-in board [y x] stone) xy)]
+    (when (valid-move? board candidate-board xy)
+      (remove-captured-chains candidate-board xy))))
 
 
-;; TO THINK ABOUT:
-;;  - could we recalculate a chain's liberties when we need them
-;;    instead of keeping track of them all the time?
-;;  - could use some kind of memoing/caching so calculation is not expensive?
-;;     - probably not whie maintaining general usefulness of functions
+
+;;;; Testing CLI
+
+(defn- cli-parse-user-coords [input]
+  (vec (map #(Integer/parseInt %) (clojure.string/split input #"-"))))
+
+(defn cli-place-stones [board color]
+  (println (cli/print-board board))
+  (let [input (read-line)]
+    (cond
+     (= "stop" input) (println "G'bye!")
+     (= "board" input) (do (println board) (recur board color))
+
+     :else (let [coords (cli-parse-user-coords input)
+                 new-board (put-stone-at-point board color coords)]
+             (if new-board
+               (recur new-board (next-color color))
+               (recur board color))))))
+
+(cli-place-stones (empty-board) :black)
+

@@ -28,7 +28,8 @@
 
   :plugins [[lein-cljsbuild "1.0.0-alpha2"]
             [lein-ring "0.8.7"]
-            [lein-pdo "0.1.1"]]
+            [lein-pdo "0.1.1"]
+            [lein-ritz "0.7.0"]]
 
   :ring {:handler go-game-server.core/app
          :init go-game-server.core/init}
