@@ -145,3 +145,5 @@
 
 (cli-place-stones (empty-board) :black)
 
+
+;; TODO: lets you commit suicide
