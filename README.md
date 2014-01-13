@@ -7,6 +7,8 @@ __Building a go game to learn some clojure. Forgive its many shortcomings.__
 
 `cd /path/to/cloned/repo`
 
+`lein cljsbuild once`
+
 `lein ring server`
 
 `open "http://localhost:3000"` (<- should happen automatically)
