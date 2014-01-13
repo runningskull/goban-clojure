@@ -9,6 +9,10 @@
             [clojure.java.io :as io]))
 
 
+
+;;;; THIS DOESN'T DO ANYTHING RIGHT NOW
+
+
 (def comments (atom []))
 
 (defn json-response [data & [status]]
