@@ -3,8 +3,8 @@
   (:require [cljs.core.async :refer [<! >! chan timeout]]
             [chord.client :refer [ws-ch]]
             [cloact.core :as cloact :refer [atom]]
-            [go-game-client.utils :refer [guid]]
-            [go-game-lib.core :as lib]))
+            [goban-client.utils :refer [guid]]
+            [goban-lib.core :as lib]))
 
 (enable-console-print!)
 

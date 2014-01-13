@@ -1,7 +1,7 @@
 goog.addDependency("base.js", ['goog'], []);
 goog.addDependency("../cljs/core.js", ['cljs.core'], ['goog.string', 'goog.array', 'goog.object', 'goog.string.StringBuffer']);
 goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['cljs.core', 'goog.string']);
-goog.addDependency("../go_game_client/utils.js", ['go_game_client.utils'], ['cljs.core', 'cljs.reader', 'goog.ui.IdGenerator']);
+goog.addDependency("../goban_client/utils.js", ['goban_client.utils'], ['cljs.core', 'cljs.reader', 'goog.ui.IdGenerator']);
 goog.addDependency("../cloact/ratom.js", ['cloact.ratom'], ['cljs.core']);
 goog.addDependency("../cloact/debug.js", ['cloact.debug'], ['cljs.core']);
 goog.addDependency("../cloact/impl/util.js", ['cloact.impl.util'], ['cljs.core', 'cloact.debug']);
@@ -14,14 +14,10 @@ goog.addDependency("../cljs/core/async/impl/protocols.js", ['cljs.core.async.imp
 goog.addDependency("../cljs/core/async/impl/buffers.js", ['cljs.core.async.impl.buffers'], ['cljs.core', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/dispatch.js", ['cljs.core.async.impl.dispatch'], ['cljs.core.async.impl.buffers', 'cljs.core']);
 goog.addDependency("../clojure/set.js", ['clojure.set'], ['cljs.core']);
-goog.addDependency("../go_game_lib/core.js", ['go_game_lib.core'], ['cljs.core', 'clojure.set']);
+goog.addDependency("../goban_lib/core.js", ['goban_lib.core'], ['cljs.core', 'clojure.set']);
 goog.addDependency("../cljs/core/async/impl/ioc_helpers.js", ['cljs.core.async.impl.ioc_helpers'], ['cljs.core', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/channels.js", ['cljs.core.async.impl.channels'], ['cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/timers.js", ['cljs.core.async.impl.timers'], ['cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async.js", ['cljs.core.async'], ['cljs.core.async.impl.ioc_helpers', 'cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols', 'cljs.core.async.impl.timers']);
 goog.addDependency("../chord/client.js", ['chord.client'], ['cljs.core', 'cljs.core.async.impl.protocols', 'cljs.core.async']);
-goog.addDependency("../goban.js", ['goban'], ['cloact.core', 'cljs.core', 'go_game_client.utils', 'go_game_lib.core', 'cljs.core.async', 'chord.client']);
-goog.addDependency("../clojure/browser/event.js", ['clojure.browser.event'], ['cljs.core', 'goog.events.EventType', 'goog.events.EventTarget', 'goog.events']);
-goog.addDependency("../clojure/browser/net.js", ['clojure.browser.net'], ['goog.net.xpc.CrossPageChannel', 'clojure.browser.event', 'goog.net.xpc.CfgFields', 'cljs.core', 'goog.net.EventType', 'goog.json', 'goog.net.XhrIo']);
-goog.addDependency("../clojure/browser/repl.js", ['clojure.browser.repl'], ['clojure.browser.event', 'clojure.browser.net', 'cljs.core']);
-goog.addDependency("../go_game_client/connect.js", ['go_game_client.connect'], ['cljs.core', 'clojure.browser.repl']);
+goog.addDependency("../goban.js", ['goban'], ['cloact.core', 'goban_lib.core', 'cljs.core', 'goban_client.utils', 'cljs.core.async', 'chord.client']);

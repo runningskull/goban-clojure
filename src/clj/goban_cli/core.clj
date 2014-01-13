@@ -1,5 +1,5 @@
-(ns go-game-cli.core
-  (:require [go-game-lib.core :as goban]))
+(ns goban-cli.core
+  (:require [goban-lib.core :as goban]))
 
 (def CLI-PIECES {:black "O"
                 :white "@"})

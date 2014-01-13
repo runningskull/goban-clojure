@@ -22,7 +22,7 @@
                  ;; Both
                  [jarohen/chord "0.2.2"]]
 
-  :main go-game-server.core
+  :main goban-server.core
   ;; :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
   :plugins [[lein-cljsbuild "1.0.0-alpha2"]
@@ -30,12 +30,12 @@
             [lein-pdo "0.1.1"]
             [lein-ritz "0.7.0"]]
 
-  :ring {:handler go-game-server.core/app
-         :init go-game-server.core/init}
+  :ring {:handler goban-server.core/app
+         :init goban-server.core/init}
 
   :source-paths ["src/clj" "src/cljs"]
 
-  :cljsbuild {:crossovers [go-game-lib.core]
+  :cljsbuild {:crossovers [goban-lib.core]
               :crossovers-path "crossover-cljs"
               :crossover-jar false
               :builds [{:id "dev"

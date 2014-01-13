@@ -1,4 +1,4 @@
-(ns go-game-client.utils
+(ns goban-client.utils
   (:require [cljs.reader :as reader])
   (:import [goog.ui IdGenerator]))
 

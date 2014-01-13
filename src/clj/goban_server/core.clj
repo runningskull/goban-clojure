@@ -1,4 +1,4 @@
-(ns go-game-server.core
+(ns goban-server.core
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [compojure.core :refer [GET POST defroutes]]

@@ -1,4 +1,4 @@
-(ns go-game-lib.core
+(ns goban-lib.core
   (:require [clojure.set :refer [union]]))
 
 
