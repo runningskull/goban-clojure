@@ -1,0 +1,201 @@
+$board-size: 684px;
+
+$_star-points-nine: ((3 3) (7 3) (5 5) (3 7) (7 7));
+$_star-points-thirteen: ((4 4) (10 4) (7 7) (4 10) (10 10));
+$_star-points-nineteen: ((4 4) (10 4) (16 4) (4 10) (10 10) (16 10) (4 16) (10 16) (16 16));
+
+@function make_even($x) {
+    $_x: round($x);
+    @if ($x % 2 == 0) {
+	@return $_x + 1;
+    } @else {
+	@return $_x;
+    }
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background: #222932;
+    font-family: monospace;
+}
+
+#board-container {
+    padding: 20px 400px 0 0;
+}
+
+#board {
+    background: rgb(215,185,106);
+    width: $board-size;
+    height: $board-size;
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(#000, 0.32);
+
+    li {
+	position: relative;
+	display: block;
+	float: left;
+
+	&:not(.occupied) {
+	    cursor: pointer;
+	}
+
+	&.occupied {
+	    cursor: none;
+	}
+	
+	&:before, &:after {
+	    content: '';
+	    position: absolute;
+	    background: #333;
+	}
+
+	&:before {
+	    height: 1px;
+	    width: 100%;
+	    top: 50%;
+	}
+	
+	&:after {
+	    width: 1px;
+	    height: 100%;
+	    left: 50%;
+	}
+	
+	&:first-of-type {
+	    &:before {
+		width: 50%;
+		left: 50%;
+	    }
+	}
+	
+	&:last-of-type {
+	    &:before {
+		width: 50%;
+	    }
+	}
+
+	b, i {
+	    display: block;
+	    position: absolute;
+	    z-index: 98;
+	    border-radius: 100%;
+	    z-index: 99;
+	    top: 50%;
+	    left: 50%;
+	}
+	
+	b {
+	    background: #333;
+	}
+	
+	i {
+	    background: #eee;
+	}
+    }
+
+    ul:first-of-type {
+	li:after {
+	    height: 50%;
+	    top: 50%;
+	}
+    }
+    
+    ul:last-of-type {
+	li:after {
+	    height: 50%;
+	}
+    }
+
+    &.turn-black li:not(.occupied):hover {
+	background-color: rgba(#333, 0.09);
+    }
+	
+    &.turn-white li:not(.occupied):hover {
+	background-color: rgba(#eee, 0.24);
+    }
+	
+}
+
+#sidebar {
+    height: 100%;
+    width: 400px;
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: #f2f2f2;
+}
+
+#history-slider {
+    padding: 20px;
+
+    h3 {
+	margin-bottom: 0.5em;
+    }
+
+    input {
+	width: 100%;
+    }
+}
+
+#alert {
+    transition: (opacity 0.15s ease-in-out);
+    -webkit-transition: (opacity 0.15s ease-in-out);
+    -moz-transition: (opacity 0.15s ease-in-out);
+    -o-transition: (opacity 0.15s ease-in-out);
+    margin: 20px;
+    padding: 20px;
+    opacity: 0;
+
+    &.err {
+	background: rgba(#ff3333, 0.1);
+	color: rgba(#991111, 1);
+	font-weight: bold;
+	border-radius: 6px;
+	opacity: 1;
+    }
+}
+
+@mixin board($class: "nineteen",
+	     $npoints: 19,
+	     $star-points: $_star-points-nineteen) {
+
+    $stone-size: make_even(($board-size / $npoints) * 0.9);
+    $star-size: make_even(round(($stone-size / 5)));
+
+    #board.#{$class} {
+	li {
+	    height: ($board-size / $npoints);
+	    width: ($board-size / $npoints);
+	    
+	    b, i {
+		width: $stone-size;
+		height: $stone-size;
+		margin-top: -($stone-size / 2);
+		margin-left: -($stone-size / 2);
+	    }
+	}
+
+	@include star-points($star-points, $star-size);
+    }
+}
+
+@mixin star-points($star-points, $star-size) {
+    @each $point in $star-points {
+	$x: nth($point, 1);
+	$y: nth($point, 2);
+	ul:nth-of-type(#{$y}) li:nth-of-type(#{$x}) {
+	    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='" + $star-size + "' height='" + $star-size + "'><rect fill='#333' x='0' y='0' width='100%' height='100%'/></svg>");
+	    background-position: center center;
+	    background-repeat: no-repeat;
+	}
+    }
+}
+
+@include board("nineteen", 19, $_star-points-nineteen);
+@include board("thirteen", 13, $_star-points-thirteen);
+@include board("nine", 9, $_star-points-nine);

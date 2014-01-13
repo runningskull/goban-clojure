@@ -10,3 +10,6 @@ pom.xml.asc
 .repl
 out
 target
+\#*
+__*
+resources/public/css/.sass-cache

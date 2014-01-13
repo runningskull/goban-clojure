@@ -2,14 +2,18 @@
 <html>
     <head>
         <title>Play GO!</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
     <body>
-      <div id="go"></div>
+      <div id="board-container"></div>
+      <div id="sidebar"></div>
 
       <script src="http://fb.me/react-0.8.0.js"></script>
       <script src="js/out/goog/base.js"></script>
       <script src="js/go.js"></script>
-      <script>goog.require('go_game_client.app')</script>
+      <script> goog.require('goban'); </script>
+      <script>goban.run()</script>
     </body>
 </html>
 

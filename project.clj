@@ -1,8 +1,9 @@
-(defproject go-game-client "0.1.0-SNAPSHOT"
+(defproject goban "0.0.1-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "MIT License"
+            :url "http://opensource.org/licenses/MIT"}
+
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.reader "0.8.2"]
 
@@ -15,10 +16,8 @@
                  [org.clojure/clojurescript "0.0-2138"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [com.cemerick/piggieback "0.1.2"]
-                 [hickory "0.5.1"]
                  [cljs-http "0.1.2"]
-                 [om "0.1.4"]
-                 [sablono "0.1.5"]
+                 [cloact "0.1.0"]
 
                  ;; Both
                  [jarohen/chord "0.2.2"]]
@@ -36,7 +35,10 @@
 
   :source-paths ["src/clj" "src/cljs"]
 
-  :cljsbuild {:builds [{:id "dev"
+  :cljsbuild {:crossovers [go-game-lib.core]
+              :crossovers-path "crossover-cljs"
+              :crossover-jar false
+              :builds [{:id "dev"
                         :source-paths ["src/cljs"]
                         :compiler {:output-to "resources/public/js/go.js"
                                    :output-dir "resources/public/js/out"

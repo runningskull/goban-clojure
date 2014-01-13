@@ -1,5 +1,5 @@
 (ns go-game-lib.core
-  (:require [clojure.set :refer [union difference intersection]]))
+  (:require [clojure.set :refer [union]]))
 
 
 (def default-board-size 19)
@@ -8,11 +8,11 @@
 
 ;;;; Helpers
 
-(defn next-color [color]
-  (if (= :black color) :white :black))
-
 (defn- xy->yx [points]
   (mapv vec (map rseq points)))
+
+(defn next-color [color]
+  (if (= :black color) :white :black))
 
 (defn hash-board [board]
   (hash (map #(map :color %) board)))
@@ -157,6 +157,5 @@
 
 
 ;; TODO:
-;;  - doesn't even try to enforce ko or super-ko
 ;;  - doesn't allow pass/resign
 

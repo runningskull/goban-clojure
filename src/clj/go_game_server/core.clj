@@ -1,10 +1,10 @@
-(ns go-game-client.core
+(ns go-game-server.core
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [compojure.core :refer [GET POST defroutes]]
             [ring.util.response :as resp]
             [cheshire.core :as json]
-            [clojure.core.async :refer [<! >! close! go]]
+            [clojure.core.async :refer [<! >! close! go go-loop]]
             [chord.http-kit :refer [with-channel]]
             [clojure.java.io :as io]))
 
