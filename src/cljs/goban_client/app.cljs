@@ -37,6 +37,14 @@
 
 
 
+;;;; Change State
+
+(defn reset-history! []
+  (swap! game-state assoc :ko-history #{})
+  (reset! history []))
+
+
+
 ;;;; Components
 
 (defn stone [{:keys [color]}]

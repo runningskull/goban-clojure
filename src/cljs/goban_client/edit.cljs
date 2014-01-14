@@ -52,6 +52,11 @@
       (swap! history pop)
       (reset! game-state (last (pop hist))))))
 
+(defn clear-history [evt]
+  (.preventDefault evt)
+  (when (js/confirm "Really clear history?")
+    (goban/reset-history!)))
+
 (defn switch-modes [new-mode evt]
   (reset! placement-mode new-mode)
   (when-not (= new-mode :alternate-moves)
@@ -76,10 +81,12 @@
                 :on-change goto-history}]]
       [:span])))
 
-(defn undo-button []
-  [:div [:a.undo {:href "#"
-                  :on-click undo-last-move}
-         "< Undo"]])
+(defn history-buttons []
+  [:div#history-buttons
+   [:a.undo {:href "#"
+             :on-click undo-last-move} "↩ Undo"]
+   [:a.clear {:href "#"
+              :on-click clear-history} "× Clear"]])
 
 (defn mode-switcher []
   (let [mode @placement-mode]
@@ -96,7 +103,7 @@
 (defn sidebar []
   [:div
    [history-slider]
-   [undo-button]
+   [history-buttons]
    [mode-switcher]])
 
 

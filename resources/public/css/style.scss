@@ -132,8 +132,10 @@ body {
     top: 0;
     right: 0;
     background: #f2f2f2;
+}
 
-    .undo {
+#history-buttons {
+    a {
 	display: inline-block;
 	padding: 10px;
 	border: 1px solid #ccc;
@@ -142,6 +144,7 @@ body {
 	background: #e8e8e8;
 	text-decoration: none;
 	text-transform: uppercase;
+	margin-right: 8px;
 
 	&:hover {
 	    background-color: #fff;

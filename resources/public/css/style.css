@@ -72,23 +72,25 @@ body {
   top: 0;
   right: 0;
   background: #f2f2f2; }
-  #sidebar .undo {
-    display: inline-block;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    color: #555;
-    background: #e8e8e8;
-    text-decoration: none;
-    text-transform: uppercase; }
-    #sidebar .undo:hover {
-      background-color: #fff;
-      position: relative;
-      top: -1px;
-      box-shadow: 0 1px 0 rgba(204, 204, 204, 0.75); }
-    #sidebar .undo:active {
-      top: 0;
-      border-bottom-width: 1px; }
+
+#history-buttons a {
+  display: inline-block;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  color: #555;
+  background: #e8e8e8;
+  text-decoration: none;
+  text-transform: uppercase;
+  margin-right: 8px; }
+  #history-buttons a:hover {
+    background-color: #fff;
+    position: relative;
+    top: -1px;
+    box-shadow: 0 1px 0 rgba(204, 204, 204, 0.75); }
+  #history-buttons a:active {
+    top: 0;
+    border-bottom-width: 1px; }
 
 #mode-switcher {
   padding-top: 20px;
