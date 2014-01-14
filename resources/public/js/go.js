@@ -15,9 +15,11 @@ goog.addDependency("../cljs/core/async/impl/buffers.js", ['cljs.core.async.impl.
 goog.addDependency("../cljs/core/async/impl/dispatch.js", ['cljs.core.async.impl.dispatch'], ['cljs.core.async.impl.buffers', 'cljs.core']);
 goog.addDependency("../clojure/set.js", ['clojure.set'], ['cljs.core']);
 goog.addDependency("../goban_lib/core.js", ['goban_lib.core'], ['cljs.core', 'clojure.set']);
+goog.addDependency("../goban_client/core.js", ['goban_client.core'], ['cloact.core', 'goban_lib.core', 'cljs.core', 'goban_client.utils']);
+goog.addDependency("../goban_client/edit.js", ['goban_client.edit'], ['cloact.core', 'goban_lib.core', 'cljs.core', 'goban_client.core']);
 goog.addDependency("../cljs/core/async/impl/ioc_helpers.js", ['cljs.core.async.impl.ioc_helpers'], ['cljs.core', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/channels.js", ['cljs.core.async.impl.channels'], ['cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async/impl/timers.js", ['cljs.core.async.impl.timers'], ['cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async.js", ['cljs.core.async'], ['cljs.core.async.impl.ioc_helpers', 'cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols', 'cljs.core.async.impl.timers']);
 goog.addDependency("../chord/client.js", ['chord.client'], ['cljs.core', 'cljs.core.async.impl.protocols', 'cljs.core.async']);
-goog.addDependency("../goban.js", ['goban'], ['cloact.core', 'goban_lib.core', 'cljs.core', 'goban_client.utils', 'cljs.core.async', 'chord.client']);
+goog.addDependency("../goban_client/comm.js", ['goban_client.comm'], ['cljs.core', 'cljs.core.async', 'chord.client']);

@@ -7,14 +7,14 @@ body {
   font-family: monospace; }
 
 #board-container {
-  padding: 20px 400px 0 0; }
+  padding: 30px 400px 0 0; }
 
 #board {
   background: #d7b96a;
   width: 684px;
   height: 684px;
   margin: 0 auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.32); }
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.32); }
   #board li {
     position: relative;
     display: block;
@@ -71,11 +71,26 @@ body {
   right: 0;
   background: #f2f2f2; }
 
+#mode-switcher {
+  margin: 20px;
+  border: 1px solid #ccc; }
+  #mode-switcher a {
+    display: inline-block;
+    padding: 20px;
+    text-transform: uppercase;
+    font-size: 0.875em;
+    color: #aaa; }
+    #mode-switcher a.active {
+      background: #fff;
+      font-weight: bold;
+      color: #555; }
+
 #history-slider {
   padding: 20px; }
   #history-slider h3 {
     margin-bottom: 0.5em; }
   #history-slider input {
+    transform: scale(3);
     width: 100%; }
 
 #alert {
@@ -195,3 +210,33 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15px' height='15px'><rect fill='#333' x='0' y='0' width='100%' height='100%'/></svg>");
   background-position: center center;
   background-repeat: no-repeat; }
+
+body.index h1 {
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.15);
+  text-align: center;
+  letter-spacing: -3px;
+  margin-bottom: -15px;
+  font-weight: 800;
+  font-size: 160px; }
+body.index a {
+  display: block;
+  width: 240px;
+  line-height: 80px;
+  margin: 20px auto;
+  font-size: 1.125em;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 40px 0 rgba(255, 255, 255, 0.015); }
+  body.index a:hover {
+    -webkit-transform: translateY(-1px);
+    color: #eee;
+    background: rgba(255, 255, 255, 0.085);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18), inset 0 40px 0 rgba(255, 255, 255, 0.02); }
+  body.index a:active {
+    -webkit-transform: translateY(0);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 40px 0 rgba(255, 255, 255, 0.01); }

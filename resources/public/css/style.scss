@@ -4,6 +4,8 @@ $_star-points-nine: ((3 3) (7 3) (5 5) (3 7) (7 7));
 $_star-points-thirteen: ((4 4) (10 4) (7 7) (4 10) (10 10));
 $_star-points-nineteen: ((4 4) (10 4) (16 4) (4 10) (10 10) (16 10) (4 16) (10 16) (16 16));
 
+$body-bg: #222932;
+
 @function make_even($x) {
     $_x: round($x);
     @if ($x % 2 == 0) {
@@ -19,12 +21,12 @@ $_star-points-nineteen: ((4 4) (10 4) (16 4) (4 10) (10 10) (16 10) (4 16) (10 1
 }
 
 body {
-    background: #222932;
+    background: $body-bg;
     font-family: monospace;
 }
 
 #board-container {
-    padding: 20px 400px 0 0;
+    padding: 30px 400px 0 0;
 }
 
 #board {
@@ -32,7 +34,7 @@ body {
     width: $board-size;
     height: $board-size;
     margin: 0 auto;
-    box-shadow: 0 20px 40px rgba(#000, 0.32);
+    box-shadow: 0 30px 60px rgba(#000, 0.32);
 
     li {
 	position: relative;
@@ -130,6 +132,25 @@ body {
     background: #f2f2f2;
 }
 
+#mode-switcher  {
+    margin: 20px;
+    border: 1px solid #ccc;
+
+    a {
+	display: inline-block;
+	padding: 20px;
+	text-transform: uppercase;
+	font-size: 0.875em;
+	color: #aaa;
+
+	&.active {
+	    background: #fff;
+	    font-weight: bold;
+	    color: #555;
+	}
+    }
+}
+
 #history-slider {
     padding: 20px;
 
@@ -138,6 +159,7 @@ body {
     }
 
     input {
+	transform: scale(3);
 	width: 100%;
     }
 }
@@ -163,7 +185,6 @@ body {
 @mixin board($class: "nineteen",
 	     $npoints: 19,
 	     $star-points: $_star-points-nineteen) {
-
     $stone-size: make_even(($board-size / $npoints) * 0.9);
     $star-size: make_even(round(($stone-size / 5)));
 
@@ -199,3 +220,50 @@ body {
 @include board("nineteen", 19, $_star-points-nineteen);
 @include board("thirteen", 13, $_star-points-thirteen);
 @include board("nine", 9, $_star-points-nine);
+
+
+body.index {
+    h1 {
+	text-transform: uppercase;
+	color: rgba(#000, 0.15);
+	text-align: center;
+	letter-spacing: -3px;
+	margin-bottom: -15px;
+	font-weight: 800;
+	font-size: 160px;
+    }
+    
+    a {
+	display: block;
+	width: 240px;
+	line-height: 80px;
+	margin: 20px auto;
+	font-size: 1.125em;
+
+	text-align: center;
+	background: rgba(#fff, 0.05);
+
+	color: rgba(#fff, 0.7);
+
+	border-radius: px;
+	border: 1px solid rgba(#000, 0.4);
+	box-shadow:       0 1px  0 rgba(#fff, 0.03),
+	            inset 0 40px 0 rgba(#fff, 0.015);
+
+	&:hover {
+	    -webkit-transform: translateY(-1px);
+	    color: #eee;
+	    background: rgba(#fff, 0.085);
+	    border-bottom-width: 1px;
+
+	    box-shadow:       0     1px 0 rgba(#000, 0.18),
+	                inset 0    40px 0 rgba(#fff, 0.02);
+	}
+
+	&:active {
+	    -webkit-transform: translateY(0);
+	    box-shadow:       0  1px  0 rgba(#fff, 0.03),
+	                inset 0 40px 0 rgba(#fff, 0.01);
+	}
+    }
+}

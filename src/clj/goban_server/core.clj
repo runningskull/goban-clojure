@@ -1,7 +1,7 @@
 (ns goban-server.core
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
-            [compojure.core :refer [GET POST defroutes]]
+            [compojure.core :refer [defroutes GET POST]]
             [ring.util.response :as resp]
             [cheshire.core :as json]
             [clojure.core.async :refer [<! >! close! go go-loop]]
@@ -15,12 +15,6 @@
 
 (def comments (atom []))
 
-(defn json-response [data & [status]]
-  {:status (or status 200)
-   :headers {"Content-Type" "application/json"}
-   :body (json/generate-string data)})
-
-
 (defn ws-handler [req]
   (with-channel req ws
     (println "Opened websocket connection from " (req :remote-addr))
@@ -30,12 +24,13 @@
                (>! ws (format "You said: '%s' at %s" message (java.util.Date.)))
                (recur)))))
 
-
 (defroutes app-routes
-  (GET "/" [] (resp/redirect "/index.html"))
+  (GET "/" [] (resp/redirect "/index.html")) 
+  (GET "/edit" [] resp/redirect "/edit.html") 
+  (GET "/play-vs" [] resp/redirect "/play-vs.html")
   (GET "/ws" [] ws-handler)
   (route/resources "/")
-  (route/not-found "Page not found"))
+  (route/not-found "wAt? 0_o"))
 
 
 
