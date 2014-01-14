@@ -10,9 +10,12 @@
 (def input-locked (atom false))
 
 
+
+;;;; Change State
+
 (defn goto-history [evt]
   (let [turn (js/parseInt (-> evt .-target .-value))
-        hist history]
+        hist @history]
     (when (< turn (count hist)) (reset! game-state (hist turn)))
     (reset! input-locked (not= turn (- (count hist) 1)))))
 
@@ -35,6 +38,10 @@
         (reset! alert-msg {:class "err" :msg "Invalid move!"})
         (js/setTimeout #(reset! alert-msg {}) 2000)))))
 
+
+
+
+;;;; Components
 
 (defn history-slider []
   (let [viewing-history @input-locked
