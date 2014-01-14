@@ -6,9 +6,12 @@
             [cloact.core :as cloact :refer [atom]]))
 
 
-(def app-mode (atom :alternate-moves))
+(def placement-mode (atom :alternate-moves))
 (def input-locked (atom false))
 
+(def mode-labels {:alternate-moves "Alternate"
+                  :black "Black Only"
+                  :white "White Only"})
 
 
 ;;;; Change State
@@ -23,17 +26,20 @@
   (when (not @input-locked)
     (let [game-state game-state
           game @game-state
+          mode @placement-mode
           new-board (lib/place-stone (:board game) (:whose-turn game) xy (:ko-history game))]
       (when new-board
-        (swap! game-state assoc :board new-board)
-        (when (= :alternate-moves @app-mode)
-          (reset! alert-msg {})
-          (swap! game-state assoc :whose-turn (lib/next-color (:whose-turn game)))
-          (swap! game-state assoc :turn-number (inc (:turn-number game)))
-          (swap! game-state assoc :ko-history (conj (:ko-history game)
-                                                    (lib/hash-board new-board)))
-          ;; TODO: this isn't very efficient
-          (swap! history conj @game-state)))
+        (reset! alert-msg {})
+        (swap! game-state assoc
+               :board new-board
+               :whose-turn (if (= mode :alternate-moves)
+                             (lib/next-color (:whose-turn game))
+                             (:whose-turn game))
+               :turn-number (inc (:turn-number game))
+               :ko-history (conj (:ko-history game) (lib/hash-board new-board)))
+
+        ;; TODO: this isn't the most efficient way
+        (swap! history conj @game-state))
       (when-not new-board
         (reset! alert-msg {:class "err" :msg "Invalid move!"})
         (js/setTimeout #(reset! alert-msg {}) 2000)))))
@@ -46,6 +52,11 @@
       (swap! history pop)
       (reset! game-state (last (pop hist))))))
 
+(defn switch-modes [new-mode evt]
+  (reset! placement-mode new-mode)
+  (when-not (= new-mode :alternate-moves)
+    (swap! game-state assoc :whose-turn new-mode)))
+
 
 
 
@@ -54,7 +65,7 @@
 (defn history-slider []
   (let [viewing-history @input-locked
         hist @history
-        mode @app-mode]
+        mode @placement-mode]
     (if (not= :play-vs mode)
       [:div#history-slider
        [:h3 "History"]
@@ -66,14 +77,27 @@
       [:span])))
 
 (defn undo-button []
-  [:a.undo {:href "#"
-            :on-click undo-last-move}
-   "< Undo"])
+  [:div [:a.undo {:href "#"
+                  :on-click undo-last-move}
+         "< Undo"]])
+
+(defn mode-switcher []
+  (let [mode @placement-mode]
+    [:div#mode-switcher
+     (for [m (keys mode-labels)]
+       [:div
+        [:input {:type "radio"
+                 :name "placement-mode"
+                 :id (str "ms-" m)
+                 :on-click #(switch-modes m %)
+                 :checked (= mode m)}]
+        [:label {:for (str "ms-" m)} (mode-labels m)]])]))
 
 (defn sidebar []
   [:div
    [history-slider]
-   [undo-button]])
+   [undo-button]
+   [mode-switcher]])
 
 
 
