@@ -38,6 +38,14 @@
         (reset! alert-msg {:class "err" :msg "Invalid move!"})
         (js/setTimeout #(reset! alert-msg {}) 2000)))))
 
+(defn undo-last-move [evt]
+  (.preventDefault evt)
+  (when (not @input-locked)
+    (let [hist @history
+          game @game-state]
+      (swap! history pop)
+      (reset! game-state (last (pop hist))))))
+
 
 
 
@@ -57,9 +65,15 @@
                 :on-change goto-history}]]
       [:span])))
 
+(defn undo-button []
+  [:a.undo {:href "#"
+            :on-click undo-last-move}
+   "< Undo"])
+
 (defn sidebar []
   [:div
-   [history-slider]])
+   [history-slider]
+   [undo-button]])
 
 
 
