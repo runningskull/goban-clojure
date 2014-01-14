@@ -7,7 +7,8 @@ body {
   font-family: monospace; }
 
 #board-container {
-  padding: 30px 400px 0 0; }
+  padding: 30px 400px 0 0;
+  position: relative; }
 
 #board {
   background: #d7b96a;
@@ -94,19 +95,24 @@ body {
     width: 100%; }
 
 #alert {
-  transition: opacity 0.15s ease-in-out;
-  -webkit-transition: opacity 0.15s ease-in-out;
-  -moz-transition: opacity 0.15s ease-in-out;
-  -o-transition: opacity 0.15s ease-in-out;
+  position: absolute;
+  top: -30px;
+  right: 400px;
+  transition: all 0.15s ease-in-out;
+  -webkit-transition: all 0.15s ease-in-out;
+  -moz-transition: all 0.15s ease-in-out;
+  -o-transition: all 0.15s ease-in-out;
   margin: 20px;
   padding: 20px;
-  opacity: 0; }
+  opacity: 0;
+  z-index: 999; }
   #alert.err {
-    background: rgba(255, 51, 51, 0.1);
-    color: #991111;
+    background: rgba(255, 101, 101, 0.9);
+    color: #443333;
     font-weight: bold;
     border-radius: 6px;
-    opacity: 1; }
+    opacity: 1;
+    top: 0; }
 
 #board.nineteen li {
   height: 36px;

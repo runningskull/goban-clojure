@@ -42,31 +42,33 @@
 (defn stone [{:keys [color]}]
   [(dom-pieces color)])
 
-(defn point [{:keys [place-stone stn row col]}]
+(defn point [{:keys [stn row col]}]
   (let [handler @place-stone]
     [:li {:key (guid)
           :className (when stn "occupied")
           :on-click #(handler [col row])}
      (if stn [stone stn] "")]))
 
-(defn row [{:keys [place-stone row-data row-num]}]
+(defn row [{:keys [row-data row-num]}]
   [:ul {:key (guid)}
    (for [i (range (count row-data))]
      [point {:stn (row-data i)
              :row row-num
              :col i}])])
 
-(defn board [{:keys [place-stone]}]
-  (let [game @game-state
-        board-size (:board-size game)
-        board (:board game)]
-    [:div#board {:className (str (dom-board-classes board-size) " "
-                                 "turn-" (dom-board-classes (:whose-turn game)))}
-     (for [i (range (count board))]
-       [row {:row-data (board i)
-             :row-num i}])]))
-
 (defn alert-box []
   (let [aaa @alert-msg]
     [:div#alert {:className (:class aaa)}
      (or (:msg aaa) " ")]))
+
+(defn board []
+  (let [game @game-state
+        board-size (:board-size game)
+        board (:board game)]
+    [:div
+     [alert-box]
+     [:div#board {:className (str (dom-board-classes board-size) " "
+                                  "turn-" (dom-board-classes (:whose-turn game)))}
+      (for [i (range (count board))]
+        [row {:row-data (board i)
+              :row-num i}])]]))
