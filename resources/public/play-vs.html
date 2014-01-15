@@ -5,16 +5,17 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
-    <body>
+    <body class="preload">
       <div id="board-container"></div>
       <div id="sidebar"></div>
-      <div id="alert"></div>
 
       <script src="http://fb.me/react-0.8.0.js"></script>
       <script src="js/out/goog/base.js"></script>
       <script src="js/go.js"></script>
-      <script> goog.require('goban'); </script>
-      <script>goban.run()</script>
+      <script> goog.require('goban_client.play_vs'); </script>
+      <script>goban_client.play_vs.run()</script>
+
+      <script> setTimeout('document.body.className = ""', 10) </script>
     </body>
 </html>
 
