@@ -15,7 +15,18 @@ body {
   width: 684px;
   height: 684px;
   margin: 0 auto;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.32); }
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.32);
+  top: 0;
+  position: relative;
+  opacity: 1;
+  -webkit-transition: opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335), 		                top 0.25s ease-out;
+  -ms-transition: opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335), 		                top 0.25s ease-out;
+  -moz-transition: opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335), 		                top 0.25s ease-out;
+  -o-transition: opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335), 		                top 0.25s ease-out;
+  transition: opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335), 		                top 0.25s ease-out; }
+  .preload #board {
+    top: -10px;
+    opacity: 0; }
   #board li {
     position: relative;
     display: block;
@@ -71,7 +82,16 @@ body {
   position: fixed;
   top: 0;
   right: 0;
-  background: #f2f2f2; }
+  background: #f2f2f2;
+  opacity: 1;
+  -webkit-transition: all 0.25s ease-in-out;
+  -ms-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out; }
+  .preload #sidebar {
+    opacity: 0;
+    margin-right: -400px; }
 
 #history-buttons a {
   display: inline-block;
@@ -235,12 +255,13 @@ body {
 
 body.index h1 {
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.15);
+  color: #1c222a;
   text-align: center;
   letter-spacing: -3px;
   margin-bottom: -15px;
   font-weight: 800;
-  font-size: 160px; }
+  font-size: 160px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.035); }
 body.index a {
   display: block;
   width: 240px;

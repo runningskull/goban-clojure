@@ -6,6 +6,14 @@ $_star-points-nineteen: ((4 4) (10 4) (16 4) (4 10) (10 10) (16 10) (4 16) (10 1
 
 $body-bg: #222932;
 
+@mixin prefix($name, $argument) {
+  -webkit-#{$name}: #{$argument};
+  -ms-#{$name}: #{$argument};
+  -moz-#{$name}: #{$argument};
+  -o-#{$name}: #{$argument};
+  #{$name}: #{$argument};
+}
+
 @function make_even($x) {
     $_x: round($x);
     @if ($x % 2 == 0) {
@@ -36,6 +44,17 @@ body {
     height: $board-size;
     margin: 0 auto;
     box-shadow: 0 30px 60px rgba(#000, 0.32);
+    top: 0;
+    position: relative;
+    opacity: 1;
+
+    @include prefix(transition, "opacity 0.25s cubic-bezier(0.600, 0.040, 0.980, 0.335),
+		                top 0.25s ease-out");
+
+    .preload & {
+	top: -10px;
+	opacity: 0;
+    }
 
     li {
 	position: relative;
@@ -132,6 +151,14 @@ body {
     top: 0;
     right: 0;
     background: #f2f2f2;
+    opacity: 1;
+
+    @include prefix(transition, all 0.25s ease-in-out);
+
+    .preload & {
+	opacity: 0;
+	margin-right: -400px;
+    }
 }
 
 #history-buttons {
@@ -255,12 +282,13 @@ body {
 body.index {
     h1 {
 	text-transform: uppercase;
-	color: rgba(#000, 0.15);
+	color: mix(#000, $body-bg, 15%);
 	text-align: center;
 	letter-spacing: -3px;
 	margin-bottom: -15px;
 	font-weight: 800;
 	font-size: 160px;
+	text-shadow: 0 1px 0 rgba(#fff, 0.035);
     }
     
     a {

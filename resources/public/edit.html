@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
     </head>
-    <body>
+    <body class="preload">
       <div id="board-container"></div>
       <div id="sidebar"></div>
 
@@ -14,6 +14,8 @@
       <script src="js/go.js"></script>
       <script> goog.require('goban_client.edit'); </script>
       <script>goban_client.edit.run()</script>
+
+      <script> setTimeout('document.body.className = ""', 10) </script>
     </body>
 </html>
 
