@@ -9,7 +9,7 @@
 
                  ;; CLJ
                  [ring/ring-core "1.2.0"]
-                 [compojure "1.1.6"]
+                 [compojure "1.1.5"]
                  [cheshire "5.2.0"]
 
                  ;; CLJS
@@ -20,18 +20,22 @@
                  [cloact "0.1.0"]
 
                  ;; Both
-                 [jarohen/chord "0.2.2"]]
+                 [jarohen/chord "0.2.1"]]
 
   :main goban-server.core
   ;; :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
   :plugins [[lein-cljsbuild "1.0.0-alpha2"]
-            [lein-ring "0.8.7"]
-            [lein-pdo "0.1.1"]
-            [lein-ritz "0.7.0"]]
+            [jarohen/lein-frodo "0.2.0"]
+            [lein-pdo "0.1.1"]]
+            ;; [lein-ritz "0.7.0"]]
 
-  :ring {:handler goban-server.core/app
-         :init goban-server.core/init}
+  ;; :ring {:handler goban-server.core/app
+  ;;        :init goban-server.core/init}
+
+  :frodo/config-resource "config.edn"
+
+  :aliases {"server" ["pdo" "frodo"]}
 
   :source-paths ["src/clj" "src/cljs"]
 

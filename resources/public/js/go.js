@@ -22,5 +22,5 @@ goog.addDependency("../cljs/core/async/impl/channels.js", ['cljs.core.async.impl
 goog.addDependency("../cljs/core/async/impl/timers.js", ['cljs.core.async.impl.timers'], ['cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols']);
 goog.addDependency("../cljs/core/async.js", ['cljs.core.async'], ['cljs.core.async.impl.ioc_helpers', 'cljs.core.async.impl.buffers', 'cljs.core', 'cljs.core.async.impl.channels', 'cljs.core.async.impl.dispatch', 'cljs.core.async.impl.protocols', 'cljs.core.async.impl.timers']);
 goog.addDependency("../chord/client.js", ['chord.client'], ['cljs.core', 'cljs.core.async.impl.protocols', 'cljs.core.async']);
-goog.addDependency("../goban_client/comm.js", ['goban_client.comm'], ['cljs.core', 'cljs.core.async', 'chord.client']);
+goog.addDependency("../goban_client/comm.js", ['goban_client.comm'], ['cljs.core', 'cljs.reader', 'cljs.core.async', 'chord.client']);
 goog.addDependency("../goban_client/play_vs.js", ['goban_client.play_vs'], ['cloact.core', 'goban_lib.core', 'cljs.core', 'goban_client.comm', 'goban_client.core']);

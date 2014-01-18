@@ -9,6 +9,7 @@
 (def input-locked (atom false))
 (def my-color (atom :black))
 (def chat-messages (atom []))
+(def connected (atom false))
 
 
 
@@ -42,7 +43,28 @@
 
 
 
+;;;; DOM Event Handlers
+
+(defn connect [evt]
+  (.preventDefault evt)
+  (let [username (.getElementById js/document "username")]
+    (comm/connect-to-server
+     "ws://localhost:3000/ws"
+     {:welcome handle-welcome
+      :nil prn})))
+
+
+
 ;;;; Components
+
+(defn username-form []
+  (let [connected? @connected]
+    [:form#username-form
+     {:on-submit connect
+      :style (when connected? {:display "none"})}
+     [:h4 "Enter a username:"]
+     [:input#username {:type "text"}]
+     [:input {:type "submit" :value "Connect"}]]))
 
 (defn whose-turn-sign []
   (let [turn (:whose-turn @game-state)
@@ -74,17 +96,38 @@
 
 (defn sidebar []
   [:div
-   [whose-turn-sign]
-   [scoreboard]
-   [chat-pane]])
+   [username-form]
+   (when @connected
+     [whose-turn-sign]
+     [scoreboard]
+     [chat-pane])])
+
+(defn container []
+  [:div
+   [:div#board-container
+    (when @connected
+      [goban/board])]
+   [:div#sidebar [sidebar]]])
+
+
+
+;;;; Server Message Handlers
+
+(defn handle-welcome []
+  (prn "Welcomed by server")
+  (reset! connected true))
 
 
 
 
 ;;;; Go!
 
+
+;; Stateful... KILL IT WITH FIRE at some point
 (reset! goban/place-stone place-stone)
 
+(defn render []
+  (cloact/render-component [container] (.-body js/document)))
+
 (defn ^:export run []
-  (cloact/render-component [goban/board] (.getElementById js/document "board-container"))
-  (cloact/render-component [sidebar] (.getElementById js/document "sidebar")))
+  (render))

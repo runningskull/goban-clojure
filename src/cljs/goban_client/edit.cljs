@@ -113,6 +113,6 @@
 (reset! goban/place-stone place-stone)
 
 (defn ^:export run []
-  (cloact/render-component [goban/board] (.getElementById js/document "board-container"))
+  (cloact/render-component [goban/board] (.-body js/document))
   (cloact/render-component [sidebar] (.getElementById js/document "sidebar")))
 
