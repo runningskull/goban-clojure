@@ -12,3 +12,4 @@ target
 \#*
 __*
 resources/public/css/.sass-cache
+resources/public/js/out
