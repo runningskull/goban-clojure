@@ -1,7 +1,8 @@
 (ns goban-client.edit
   (:require [goban-client.core :as goban :refer [history
                                                  game-state
-                                                 alert-msg]]
+                                                 show-alert!
+                                                 hide-alert!]]
             [goban-lib.core :as lib]
             [cloact.core :as cloact :refer [atom]]))
 
@@ -22,27 +23,13 @@
     (when (< turn (count hist)) (reset! game-state (hist turn)))
     (reset! input-locked (not= turn (- (count hist) 1)))))
 
-(defn place-stone [[x y :as xy]]
-  (when (not @input-locked)
-    (let [game-state game-state
-          game @game-state
+(defn place-stone! [[x y :as xy]]
+  (when-not @input-locked
+    (let [game @game-state
           mode @placement-mode
-          new-board (lib/place-stone (:board game) (:whose-turn game) xy (:ko-history game))]
-      (when new-board
-        (reset! alert-msg {})
-        (swap! game-state assoc
-               :board new-board
-               :whose-turn (if (= mode :alternate-moves)
-                             (lib/next-color (:whose-turn game))
-                             (:whose-turn game))
-               :turn-number (inc (:turn-number game))
-               :ko-history (conj (:ko-history game) (lib/hash-board new-board)))
-
-        ;; TODO: this isn't the most efficient way
-        (swap! history conj @game-state))
-      (when-not new-board
-        (reset! alert-msg {:class "err" :msg "Invalid move!"})
-        (js/setTimeout #(reset! alert-msg {}) 2000)))))
+          next-color (when-not (= mode :alternate-moves) mode)
+          new-board (goban/place-stone! game-state xy next-color)]
+      new-board)))
 
 (defn undo-last-move [evt]
   (.preventDefault evt)
@@ -110,9 +97,9 @@
 
 ;;;; Go!
 
-(reset! goban/place-stone place-stone)
+(reset! goban/handle-point-click! place-stone!)
 
 (defn ^:export run []
-  (cloact/render-component [goban/board] (.-body js/document))
+  (cloact/render-component [goban/board] (.getElementById js/document "board-container"))
   (cloact/render-component [sidebar] (.getElementById js/document "sidebar")))
 
