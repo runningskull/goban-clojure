@@ -4,14 +4,20 @@
             [cljs.reader :refer [read-string]]
             [chord.client :refer [ws-ch]]))
 
+(def channel (atom nil))
 
-(defn- prnt [& args]
-  (prn (apply str (interpose " " args))))
+(defn- listen-to-server [chan handlers]
+  (go
+   (let [{str :message} (<! chan)
+         msg (read-string str)]
+     ((handlers (first msg)) (rest msg)))))
 
 (defn connect-to-server [url handlers]
   (go
-   (let [ws (<! (ws-ch url))
-         {msg :message} (<! ws)
-         cmd (read-string msg)]
-     (prn "    << Server says " msg " >>")
-     ((handlers (first cmd)) (rest cmd)))))
+   (let [chan (<! (ws-ch url))]
+     (reset! channel chan)
+     (listen-to-server chan handlers))))
+
+(defn tell-server [msg]
+  (go
+   (>! @channel msg)))

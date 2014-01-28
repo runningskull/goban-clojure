@@ -27,8 +27,12 @@
 
   :plugins [[lein-cljsbuild "1.0.0-alpha2"]
             [jarohen/lein-frodo "0.2.0"]
-            [lein-pdo "0.1.1"]]
+            [lein-pdo "0.1.1"]
+            [lein-drip "0.1.1-SNAPSHOT"]]
             ;; [lein-ritz "0.7.0"]]
+
+  :ring {:handler goban-server.core/app
+         :auto-reload true}
 
   ;; :ring {:handler goban-server.core/app
   ;;        :init goban-server.core/init}
@@ -52,6 +56,5 @@
                                    :pretty-print true
                                    :source-map true}}]}
   
-  :profiles {:uberjar {:aot :all}
-                                        ;; :dev {:plugins [[com.cemerick/austin "0.1.3"]]}
-             })
+  :profiles {:uberjar {:aot :all}})
+             ;; :user {:plugins [[lein-drip "0.1.1-SNAPSHOT"]]}})

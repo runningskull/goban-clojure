@@ -4,10 +4,12 @@
             [cloact.core :as cloact :refer [atom]]
             [goban-client.core :as goban :refer [history
                                                  game-state
-                                                 alert-msg]]))
+                                                 hide-alert!
+                                                 show-alert!]]))
 
-(def input-locked (atom false))
-(def my-color (atom :black))
+
+(def input-locked (atom true))
+(def my-color (atom nil))
 (def chat-messages (atom []))
 (def connected (atom false))
 
@@ -15,43 +17,34 @@
 
 ;;;; Change State
 
-(defn- place-stone-in-game [game xy]
-  (let [shiner (lib/place-stone (:board game) (:whose-turn game) xy (:ko-history game))]
-    shiner))
+(defn place-stone! [[x y :as xy]]
+  (goban/place-stone! game-state xy))
 
-(defn- finalize-move! [game new-board]
-  (swap! game-state assoc
-         :board new-board
-         :whose-turn (lib/next-color (:whose-turn game))
-         :turn-number (inc (:turn-number game))
-         :ko-history (conj (:ko-history game) (lib/hash-board new-board))))
-
-(defn place-stone [[x y :as xy]]
-  (let [game @game-state]
-    (when (= @my-color (:whose-turn game))
-      (let [new-board (place-stone-in-game game xy)]
-        (when new-board
-          (reset! alert-msg {})
-          (finalize-move! game new-board)
-          (swap! history conj @game-state))
-        (when-not new-board
-          (reset! alert-msg {:class "err" :msg "Invalid move!"})
-          (js/setTimeout #(reset! alert-msg {}) 2000))))))
-
-(defn submit-chat-msg [evt]
+(defn send-chat-msg! [evt]
   (.preventDefault evt))
+
+
+
+;;;; Server Message Handlers
+
+(defn handle-welcome []
+  (show-alert! "success" "Welcome to the game")
+  (prn "WELCOMED")
+  (reset! connected true))
+
+(defn handle-game-start [[color]]
+  (reset! my-color color))
+
+(defn handle-opponent-move [[x y :as xy]]
+  (place-stone! xy))
 
 
 
 ;;;; DOM Event Handlers
 
-(defn connect [evt]
-  (.preventDefault evt)
-  (let [username (.getElementById js/document "username")]
-    (comm/connect-to-server
-     "ws://localhost:3000/ws"
-     {:welcome handle-welcome
-      :nil prn})))
+(defn handle-point-click! [[x y :as xy]]
+  (when (= @my-color (:whose-turn @game-state))
+    (place-stone! xy)))
 
 
 
@@ -61,10 +54,11 @@
   (let [connected? @connected]
     [:form#username-form
      {:on-submit connect
-      :style (when connected? {:display "none"})}
-     [:h4 "Enter a username:"]
-     [:input#username {:type "text"}]
-     [:input {:type "submit" :value "Connect"}]]))
+      :style (when connected? {:display "none"})
+      :autoComplete "off"}
+     [:h4 "What's your name?"]
+     [:input#username {:type "text" :autoFocus true}]
+     [:a.submit "Connect"]]))
 
 (defn whose-turn-sign []
   (let [turn (:whose-turn @game-state)
@@ -73,7 +67,7 @@
 
 (defn chat-pane []
   (let [message @chat-messages]
-    [:form.chat {:on-submit submit-chat-msg}
+    [:form.chat {:on-submit send-chat-msg!}
      [:h2 "Chat..."]
      [:ol.log
       [:li "testing message one"]
@@ -96,14 +90,14 @@
 
 (defn sidebar []
   [:div
-   [username-form]
+   ;; [username-form]
    (when @connected
      [whose-turn-sign]
      [scoreboard]
      [chat-pane])])
 
 (defn container []
-  [:div
+  [:div#vs-container {:class (when-not @connected "disconnected")}
    [:div#board-container
     (when @connected
       [goban/board])]
@@ -111,23 +105,26 @@
 
 
 
-;;;; Server Message Handlers
-
-(defn handle-welcome []
-  (prn "Welcomed by server")
-  (reset! connected true))
-
-
-
 
 ;;;; Go!
 
 
-;; Stateful... KILL IT WITH FIRE at some point
-(reset! goban/place-stone place-stone)
+;; Hacky... kill it (with fire) at some point
+(reset! goban/handle-point-click! handle-point-click!)
+
+(defn connect []
+  (let [[player-id game-id] (clojure.string/split
+                             (subs (.-hash js/location) 1) #"@")]
+    (prn "GAMEID" game-id)
+    (comm/connect-to-server
+     (str "ws://localhost:3000/vs/" game-id "/" player-id)
+     {:welcome handle-welcome
+      :game-start handle-game-start
+      :nil prn})))
 
 (defn render []
   (cloact/render-component [container] (.-body js/document)))
 
 (defn ^:export run []
+  (connect)
   (render))
